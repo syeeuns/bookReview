@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+
+    <!-- 구글폰트 -->
+    <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700&display=swap" rel="stylesheet">
+    <style>
+
+    </style>
+    <title>Book scrap & review</title>
+    <style>
+        *{
+            font-family: 'Nanum Myeongjo', serif;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .head {
+            margin: 20px auto;
+        }
+
+        .table {
+            margin-top: 100px;
+        }
+
+        .review {
+            text-align: center;
+        }
+
+        img {
+            width: 100%;
+            height: auto;
+        }
+    </style>
+    <script>
+        $(function () {
+            showReview();
+        });
+
+        function showReview() {
+            $.ajax({
+                type: 'GET',
+                url: "/review",
+                data: {},
+                success: function (response) {
+                    let books = response['books'];
+                    for(let i=0; i<books.length; i++){
+                        let title = books[i]['title'];
+                        let author = books[i]['author'];
+                        let review = books[i]['review'];
+
+                        let temp_html =
+                            `<tr>
+                                <th scope="row">${i+1}</th>
+                                <td>${title}</td>
+                                <td>${author}</td>
+                                <td>${review}</td>
+                            </tr>`;
+
+                        $('tbody').append(temp_html);
+                    }
+                }
+            })
+        }
+
+        function saveReview() {
+            let title = $('#input-title').val();
+            let author = $('#input-author').val();
+            let review = $('#input-review').val();
+
+            if(title=="" || author=="" || review==""){
+                alert('리뷰 입력을 완료해주세요.');
+                return;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: "/review",
+                data: {'title_give': title, 'author_give': author, 'review_give': review},
+                success: function (response) {
+                    alert(response['msg']);
+                    window.location.reload();
+                }
+            })
+        }
+
+    </script>
+</head>
+<body>
+<div class="container">
+
+    <img src={{url_for('static', filename='books.jpg' )}}>
+    <div class="head">
+        <h2>읽은 책에 대해 말씀해주세요.</h2>
+        <h6>다른 사람을 위해 리뷰를 남겨주세요! 다 같이 좋은 책을 읽는다면 다 함께 행복해질 수 있지 않을까요?</h6>
+    </div>
+
+    <form>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">제목</span>
+            </div>
+            <input id="input-title" type="text" class="form-control" aria-label="Username"
+                   aria-describedby="basic-addon1">
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon2">저자</span>
+            </div>
+            <input id="input-author" type="text" class="form-control" aria-label="Username"
+                   aria-describedby="basic-addon1">
+        </div>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">리뷰</span>
+            </div>
+            <textarea id="input-review" class="form-control" aria-label="With textarea" cols="30" rows="5"
+                      placeholder="200자까지 입력할 수 있습니다."></textarea>
+        </div>
+    </form>
+    <div class="review">
+        <button type="button" class="btn btn-primary" onclick="saveReview()">리뷰 작성</button>
+    </div>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">제목</th>
+            <th scope="col">저자</th>
+            <th scope="col">리뷰</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
